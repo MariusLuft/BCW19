@@ -10,6 +10,9 @@
     <GridLayout class="page-content">
         <StackLayout>
             <Button text="SCAN" tap="getScan" />
+
+
+            <Label id="capacitorLabel" text="{{ capacitorValue }}" textWrap="true" />
         </StackLayout>
     </GridLayout>
 </Page>
