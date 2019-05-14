@@ -93,7 +93,4 @@ describe('POST /journey/:bagId/finish', () => {
         expect(journey.body).toHaveLength(1)
         expect(journey.body[0]).toMatchObject(tx2)
     })
-
-    // Create tx ID
-    // Create journey ID
 })
