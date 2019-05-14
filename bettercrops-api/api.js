@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const bodyParser = require('body-parser')
+const store = require('./store')
+const uuid = require('uuid/v4')
 const { Validator, ValidationError } = require('express-json-validator-middleware')
 
 const validator = new Validator({allErrors: true})
@@ -10,9 +12,11 @@ router.use(bodyParser.json())
 // Journey -------------------------------------------------------------------------------------------------------------
 
 router.get('/journey/:bagId', (req, res) => {
+    const currentJourneyId = store.getCurrentJourney(req.params.bagId)
+    const journey = currentJourneyId ? store.findTxByJourney(currentJourneyId) : []
     res
         .status(200)
-        .json([])
+        .json(journey)
 })
 
 router.post('/journey/:bagId/reset', (req, res) =>  {
@@ -68,6 +72,11 @@ const txSchema = {
 }
 
 router.post('/transaction', validator.validate({ body: txSchema, jsonPointers: true }), (req, res) => {
+    const tx = req.body
+    const journeyId = store.getCurrentJourney(tx.bagId)
+    tx.txId = uuid()
+    tx.journeyId = journeyId || uuid()
+    store.saveTx(req.body)
     res
         .status(201)
         .json({
