@@ -12,7 +12,8 @@
             <Button text="SCAN" tap="getScan" />
 
 
-            <Label id="capacitorLabel" text="{{ capacitorValue }}" textWrap="true" />
+            <Label id="capacitorLabel" text="{{ capacitorLabelText }}" textWrap="true" />
+            <Label id="rfidLabel" text="{{ rfidLabelText }}" textWrap="true" />
         </StackLayout>
     </GridLayout>
 </Page>
