@@ -9,10 +9,13 @@
     "express-json-validator-middleware": "^2.0.0",
     "uuid": "^3.3.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "jest": "^24.8.0",
+    "supertest": "^4.0.2"
+  },
   "scripts": {
-    "start": "node api.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "test": "jest"
   },
   "author": "BetterCrop",
   "license": "ISC"
