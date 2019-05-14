@@ -1,24 +1,43 @@
-var express = require('express')
-var bodyParser = require('body-parser')
+const express = require('express')
+const router = express.Router()
+const bodyParser = require('body-parser')
+const { Validator, ValidationError } = require('express-json-validator-middleware')
 
-var app = express()
+const validator = new Validator({allErrors: true})
 
-app.use(bodyParser.json())
+router.use(bodyParser.json())
 
-app.put('/quality/check', (req, res) => {
-    res.send('Good quality')
+// Journey -------------------------------------------------------------------------------------------------------------
+
+router.get('/journey/:bagId', (req, res) => {
+    res
+        .status(200)
+        .json([])
 })
 
-app.get('/journey/:bagId', (req, res) => {
-    res.send('The Journey of: ' + req.params.bagId)
+router.post('/journey/:bagId/reset', (req, res) =>  {
+    res
+        .status(500)
+        .json({ error: 'Not implemented' })
 })
 
-app.post('/journey/:bagId/reset', (req, res) =>  {
-    res.send('Journey of: ' + req.params.bagId + ' reset')
+// Transaction ---------------------------------------------------------------------------------------------------------
+
+router.post('/transaction', (req, res) => {
+    res
+        .status(201)
+        .json({
+            txId: '12345',
+            journeyId: '12345'
+        })
 })
 
-app.post('/transaction', (req, res) => {
-    res.send('Transaction created')
+// Quality -------------------------------------------------------------------------------------------------------------
+
+router.put('/quality/check', (req, res) => {
+    res
+        .status(500)
+        .json({ error: 'Not implemented' })
 })
 
-app.listen(3000, () => console.log('Server running.'))
+module.exports = router
