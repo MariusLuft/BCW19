@@ -34,10 +34,19 @@ describe('POST /transaction', () => {
             buyerId: '0293/2983749',
             scannerId: '39300-3948-38'
         }
-        const res = await request(app).post('/transaction')
+        const res = await request(app).post('/transaction').send(tx)
         expect(res.statusCode).toEqual(201)
         expect(res.body.txId).toBeDefined
         expect(res.body.journeyId).toBeDefined
+    })
+
+    test('it should not accept an invalid transaction', async () => {
+        const app = initApi()
+        const res = await request(app).post('/transaction').send({})
+        expect(res.statusCode).toEqual(400)
+        expect(res.body.map(item => item.params.missingProperty).sort()).toEqual([
+            'bagId', 'buyerId', 'measurement', 'price', 'scannerId', 'sellerId', 'timestamp'
+        ].sort())
     })
 
     // Create tx ID

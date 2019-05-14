@@ -23,7 +23,51 @@ router.post('/journey/:bagId/reset', (req, res) =>  {
 
 // Transaction ---------------------------------------------------------------------------------------------------------
 
-router.post('/transaction', (req, res) => {
+const txSchema = {
+    type: 'object',
+    required: [ 'bagId', 'timestamp', 'measurement', 'price', 'sellerId', 'buyerId', 'scannerId' ],
+    properties:  {
+        bagId: {
+            type: 'string'
+        },
+        timestamp: {
+            type: 'string',
+            format: 'date-time'
+        },
+        measurement: {
+            type: 'object',
+            required: [ 'capacity' ],
+            properties: {
+                capacity: {
+                    type: 'number'
+                }
+            }
+        },
+        price: {
+            type: 'object',
+            required: [ 'amount', 'currency' ],
+            properties: {
+                amount: {
+                    type: 'number'
+                },
+                currency: {
+                    type: 'string'
+                }
+            }
+        },
+        sellerId: {
+            type: 'string'
+        },
+        buyerId: {
+            type: 'string'
+        },
+        scannerId: {
+            type: 'string'
+        }
+    }
+}
+
+router.post('/transaction', validator.validate({ body: txSchema, jsonPointers: true }), (req, res) => {
     res
         .status(201)
         .json({
@@ -38,6 +82,17 @@ router.put('/quality/check', (req, res) => {
     res
         .status(500)
         .json({ error: 'Not implemented' })
+})
+
+// Error handler -------------------------------------------------------------------------------------------------------
+
+router.use((err, req, res, next) => {
+    if (err instanceof ValidationError) {
+        res.status(400).send(err.validationErrors.body)
+        next()
+    } else {
+        next(err)
+    }
 })
 
 module.exports = router
