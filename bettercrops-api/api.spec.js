@@ -9,6 +9,22 @@ const initApi = () => {
     return app
 }
 
+const transaction = (bagId = uuid()) => {
+    return {
+        bagId: bagId,
+        measurement: {
+            capacity: 1837
+        },
+        price: {
+            amount: 100.32,
+            currency: 'USD'
+        },
+        sellerId: '0298/3847390',
+        buyerId: '0293/2983749',
+        scannerId: '39300-3948-38'
+    }
+}
+
 describe('GET /journey/:bagId', () => {
     test('it should return an empty journey for an unknown bag', async () => {
         const app = initApi()
@@ -19,28 +35,13 @@ describe('GET /journey/:bagId', () => {
 })
 
 describe('POST /transaction', () => {
-    const transaction = (bagId = uuid()) => {
-        return {
-            bagId: bagId,
-            measurement: {
-                capacity: 1837
-            },
-            price: {
-                amount: 100.32,
-                currency: 'USD'
-            },
-            sellerId: '0298/3847390',
-            buyerId: '0293/2983749',
-            scannerId: '39300-3948-38'
-        }
-    }
-
     test('it should accept a valid transaction', async () => {
         const app = initApi()
         const res = await request(app).post('/transaction').send(transaction())
         expect(res.statusCode).toEqual(201)
-        expect(res.body.txId).toBeDefined
-        expect(res.body.journeyId).toBeDefined
+        expect(res.body.txId).toBeDefined()
+        expect(res.body.journeyId).toBeDefined()
+        expect(res.body.timestamp).toBeDefined()
     })
 
     test('it should not accept an invalid transaction', async () => {
@@ -52,24 +53,46 @@ describe('POST /transaction', () => {
         ].sort())
     })
 
-    test('it should append transaction to bag journey and set a tx timestamp', async () => {
+    test('it should start a new bag journey and set tx metadata', async () => {
         const app = initApi()
         const tx = transaction()
-        const res = await request(app).post('/transaction').send(tx)
+        await request(app).post('/transaction').send(tx)
         const journey = await request(app).get('/journey/' + tx.bagId)
         expect(journey.body).toHaveLength(1)
         expect(journey.body[0]).toMatchObject(tx)
+        expect(journey.body[0].txId).toBeDefined()
+        expect(journey.body[0].journeyId).toBeDefined()
         expect(journey.body[0].timestamp).toBeDefined()
     })
 
-    /*
-    test('it should return different journey ID for the same bag when journey was reset', async () => {
+    test('it should append to the current bag journey', async () => {
         const app = initApi()
-        const journeyId1 = (await request(app).post('/transaction').send(tx)).body.journeyId
-        await request(app).post('/journey/' + tx.bagId + '/reset')
-
+        const bagId = uuid()
+        const tx1 = transaction(bagId)
+        const tx2 = transaction(bagId)
+        await request(app).post('/transaction').send(tx1)
+        await request(app).post('/transaction').send(tx2)
+        const journey = await request(app).get('/journey/' + bagId)
+        expect(journey.body).toHaveLength(2)
+        expect(journey.body[0]).toMatchObject(tx1)
+        expect(journey.body[1]).toMatchObject(tx2)
     })
-    */
+})
+
+describe('POST /journey/:bagId/finish', () => {
+    test('it should start a new bag journey on next transaction', async () => {
+        const app = initApi()
+        const bagId = uuid()
+        const tx1 = transaction(bagId)
+        const tx2 = transaction(bagId)
+        const res1 = await request(app).post('/transaction').send(tx1)
+        const reset = await request(app).post('/journey/' + bagId + '/finish')
+        expect(reset.statusCode).toBe(200)
+        const res2 = await request(app).post('/transaction').send(tx2)
+        const journey = await request(app).get('/journey/' + bagId)
+        expect(journey.body).toHaveLength(1)
+        expect(journey.body[0]).toMatchObject(tx2)
+    })
 
     // Create tx ID
     // Create journey ID

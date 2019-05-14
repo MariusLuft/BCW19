@@ -19,10 +19,14 @@ router.get('/journey/:bagId', (req, res) => {
         .json(journey)
 })
 
-router.post('/journey/:bagId/reset', (req, res) =>  {
-    res
-        .status(500)
-        .json({ error: 'Not implemented' })
+router.post('/journey/:bagId/finish', (req, res) =>  {
+    const journeyId = store.getCurrentJourney(req.params.bagId)
+    if (journeyId) {
+        store.finishJourney(journeyId)
+        res.status(200).send()
+    } else {
+        res.status(400).json({ error: 'no current journey for bag' })
+    }
 })
 
 // Transaction ---------------------------------------------------------------------------------------------------------
@@ -77,8 +81,9 @@ router.post('/transaction', validator.validate({ body: txSchema, jsonPointers: t
     res
         .status(201)
         .json({
-            txId: '12345',
-            journeyId: '12345'
+            txId: tx.txId,
+            journeyId: tx.journeyId,
+            timestamp: tx.timestamp
         })
 })
 
