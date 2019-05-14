@@ -29,14 +29,10 @@ router.post('/journey/:bagId/reset', (req, res) =>  {
 
 const txSchema = {
     type: 'object',
-    required: [ 'bagId', 'timestamp', 'measurement', 'price', 'sellerId', 'buyerId', 'scannerId' ],
+    required: [ 'bagId', 'measurement', 'price', 'sellerId', 'buyerId', 'scannerId' ],
     properties:  {
         bagId: {
             type: 'string'
-        },
-        timestamp: {
-            type: 'string',
-            format: 'date-time'
         },
         measurement: {
             type: 'object',
@@ -76,6 +72,7 @@ router.post('/transaction', validator.validate({ body: txSchema, jsonPointers: t
     const journeyId = store.getCurrentJourney(tx.bagId)
     tx.txId = uuid()
     tx.journeyId = journeyId || uuid()
+    tx.timestamp = new Date()
     store.saveTx(req.body)
     res
         .status(201)

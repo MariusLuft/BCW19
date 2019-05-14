@@ -22,7 +22,6 @@ describe('POST /transaction', () => {
     const transaction = (bagId = uuid()) => {
         return {
             bagId: bagId,
-            timestamp: '2084-04-23T18:25:43.511Z',
             measurement: {
                 capacity: 1837
             },
@@ -49,17 +48,18 @@ describe('POST /transaction', () => {
         const res = await request(app).post('/transaction').send({})
         expect(res.statusCode).toEqual(400)
         expect(res.body.map(item => item.params.missingProperty).sort()).toEqual([
-            'bagId', 'buyerId', 'measurement', 'price', 'scannerId', 'sellerId', 'timestamp'
+            'bagId', 'buyerId', 'measurement', 'price', 'scannerId', 'sellerId'
         ].sort())
     })
 
-    test('it should append transaction to bag journey', async () => {
+    test('it should append transaction to bag journey and set a tx timestamp', async () => {
         const app = initApi()
         const tx = transaction()
         const res = await request(app).post('/transaction').send(tx)
         const journey = await request(app).get('/journey/' + tx.bagId)
         expect(journey.body).toHaveLength(1)
         expect(journey.body[0]).toMatchObject(tx)
+        expect(journey.body[0].timestamp).toBeDefined()
     })
 
     /*
