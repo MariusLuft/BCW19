@@ -44,10 +44,13 @@ export class GaugesCustomizationComponent implements AfterViewInit {
                 //console.log("RFID Value: " + rfidJson.in.value.deviceRawTypeValue);
                 var rfidValue = rfidJson.in.value.deviceRawTypeValue;
                 let rfidlbl = <Label>getViewById(parent, "rfidLabel");
-                rfidlbl.text = rfidValue;
+                rfidValue = String(rfidValue).substring(4);
+                rfidValue = String(rfidValue).substring(0, String(rfidValue).length-4);
+                rfidValue = String(rfidValue).replace(/,/gi, "-");
+                rfidlbl.text = "Bag ID: " + rfidValue;
 
 
-                var timestampValue = (new Date).toLocaleDateString("%A, %B, %e, %Y");
+                var timestampValue = (new Date).toLocaleDateString("%A, %B, %e, %Y, %HH:MM:ss");
                 let timestamplbl = <Label>getViewById(parent, "timestampLabel");
                 timestamplbl.text = timestampValue;
 
