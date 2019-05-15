@@ -1,0 +1,25 @@
+<GridLayout tkExampleTitle tkToggleNavButton rows="*, auto">
+
+    <StackLayout row="0" orientation="vertical" horizontalAlignment="center">
+            <Label id="timestampLabel" text="{{ timestampLabelText }}" textWrap="true"></Label>
+    </StackLayout>
+    <!-- >> gauges-customization-angular-html -->
+        <RadRadialGauge class="gauge">
+            <RadialScale #myScale tkRadialGaugeScales startAngle="0" sweepAngle="360" minimum="100" maximum="220" radius="0.9">
+                <ScaleStyle tkRadialScaleStyle ticksVisible="false" labelsVisible="false" lineThickness="0"></ScaleStyle>
+
+                <gauge:RadialScale.indicators>
+                    <RadialBarIndicator tkRadialScaleIndicators minimum="100" maximum="220" location="0.75" isAnimated="true">
+                        <BarIndicatorStyle tkRadialBarIndicatorStyle cap="Round" fillColor="rgba(132,235,247,1)" barWidth="0.2"></BarIndicatorStyle>
+                    </RadialBarIndicator>
+                </gauge:RadialScale.indicators>
+            </RadialScale>
+        </RadRadialGauge>
+    <!-- << gauges-customization-angular-html -->
+
+    <Button text="SCAN" (tap)="getScan($event)"></Button>
+    <StackLayout row="2" orientation="vertical" horizontalAlignment="center">
+        <!---Label id="capacitorLabel" text="{{ capacitorLabelText }}" textWrap="true"></Label-->
+        <Label id="rfidLabel" text="{{ rfidLabelText }}" textWrap="true"></Label>
+    </StackLayout>
+</GridLayout>
