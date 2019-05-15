@@ -3,7 +3,6 @@ var finishedJourneys = []
 
 const saveTx = tx => {
     transactions.push(tx)
-    return '123'
 }
 
 const findTxByJourney = journeyId => {
